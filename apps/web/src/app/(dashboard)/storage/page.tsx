@@ -39,7 +39,7 @@ export default function StoragePage() {
     }
 
     try {
-      const response = await uploadImage(file);
+      const response = await uploadImage({ file, workspaceId: 'default' });
       setUploadedFileUrl(response.url);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to upload image. Please try again.');

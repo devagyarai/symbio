@@ -20,6 +20,7 @@ import dashboardRoutes from "./modules/dashboard/dashboard.routes";
 import { initSocketServer } from "./socket/socket.server";
 
 const app = express();
+app.set('trust proxy', 1); // Trust Render/Vercel reverse proxy for rate limiting and secure cookies
 const port = config.server.port;
 
 // Security and Performance Middleware
