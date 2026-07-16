@@ -1,0 +1,235 @@
+{
+  "info": {
+    "name": "Symbio Phase 7 - Audit Logs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Audit",
+      "item": [
+        {
+          "name": "Get Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/audit?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["audit"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" },
+                { "key": "workspaceId", "value": "", "disabled": true },
+                { "key": "organizationId", "value": "", "disabled": true }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Organizations",
+      "item": [
+        {
+          "name": "Create Organization",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/organizations", "host": ["{{base_url}}"], "path": ["organizations"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Corp\",\n  \"slug\": \"acme-corp\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Organizations",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizations?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["organizations"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Organization",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/organizations/:id", "host": ["{{base_url}}"], "path": ["organizations", ":id"], "variable": [{ "key": "id", "value": "{{org_id}}" }] }
+          }
+        },
+        {
+          "name": "Update Organization",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/organizations/:id", "host": ["{{base_url}}"], "path": ["organizations", ":id"], "variable": [{ "key": "id", "value": "{{org_id}}" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Corporation Inc.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Organization",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/organizations/:id", "host": ["{{base_url}}"], "path": ["organizations", ":id"], "variable": [{ "key": "id", "value": "{{org_id}}" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Workspaces",
+      "item": [
+        {
+          "name": "Create Workspace",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/workspaces", "host": ["{{base_url}}"], "path": ["workspaces"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"organizationId\": \"{{org_id}}\",\n  \"name\": \"Engineering\",\n  \"slug\": \"engineering\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Workspaces",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/workspaces?organizationId={{org_id}}&page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["workspaces"],
+              "query": [
+                { "key": "organizationId", "value": "{{org_id}}" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Workspace",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/workspaces/:id", "host": ["{{base_url}}"], "path": ["workspaces", ":id"], "variable": [{ "key": "id", "value": "{{workspace_id}}" }] }
+          }
+        },
+        {
+          "name": "Update Workspace",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/workspaces/:id", "host": ["{{base_url}}"], "path": ["workspaces", ":id"], "variable": [{ "key": "id", "value": "{{workspace_id}}" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Engineering Team\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Workspace",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/workspaces/:id", "host": ["{{base_url}}"], "path": ["workspaces", ":id"], "variable": [{ "key": "id", "value": "{{workspace_id}}" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Uploads",
+      "item": [
+        {
+          "name": "Upload Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/upload/image", "host": ["{{base_url}}"], "path": ["upload", "image"] },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "workspaceId",
+                  "value": "{{workspace_id}}",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Image",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": { 
+              "raw": "{{base_url}}/upload/:id?workspaceId={{workspace_id}}", 
+              "host": ["{{base_url}}"], 
+              "path": ["upload", ":id"],
+              "query": [
+                { "key": "workspaceId", "value": "{{workspace_id}}" }
+              ],
+              "variable": [{ "key": "id", "value": "{{file_asset_id}}" }] 
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000" },
+    { "key": "access_token", "value": "your_jwt_here" },
+    { "key": "org_id", "value": "org_uuid_here" },
+    { "key": "workspace_id", "value": "ws_uuid_here" },
+    { "key": "file_asset_id", "value": "file_asset_uuid_here" }
+  ]
+}

@@ -1,3 +1,5 @@
-export default function Page() {
-  return <main>Symbio Frontend Foundation</main>;
+import { redirect } from 'next/navigation';
+
+export default function Home() {
+  redirect('/dashboard');
 }

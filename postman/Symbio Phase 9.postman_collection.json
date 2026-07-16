@@ -1,0 +1,163 @@
+{
+  "info": {
+    "name": "Symbio Phase 9 - Dashboard & Analytics",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Overview (Global — SUPER_ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/overview",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "overview"]
+            },
+            "description": "Returns global platform counters. SUPER_ADMIN only (no scope filter)."
+          }
+        },
+        {
+          "name": "Overview (Org-scoped — Org OWNER)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/overview?organizationId={{org_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "overview"],
+              "query": [{ "key": "organizationId", "value": "{{org_id}}" }]
+            },
+            "description": "Returns org-scoped counters. Requires OWNER role in the specified organization."
+          }
+        },
+        {
+          "name": "Overview (Workspace-scoped — WS ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/overview?workspaceId={{workspace_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "overview"],
+              "query": [{ "key": "workspaceId", "value": "{{workspace_id}}" }]
+            },
+            "description": "Returns workspace-scoped counters. Requires ADMIN role in the workspace."
+          }
+        },
+        {
+          "name": "Activity (Global)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/activity?limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "activity"],
+              "query": [{ "key": "limit", "value": "10" }]
+            },
+            "description": "Returns recent organizations, workspaces, uploads, audit logs, and logins."
+          }
+        },
+        {
+          "name": "Activity (Org-scoped)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/activity?organizationId={{org_id}}&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "activity"],
+              "query": [
+                { "key": "organizationId", "value": "{{org_id}}" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Charts (Global)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/charts",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "charts"]
+            },
+            "description": "Returns time-series data: orgs/workspaces per month, uploads/audit events/logins per day (30d), top workspaces, top orgs."
+          }
+        },
+        {
+          "name": "Charts (Org-scoped)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/charts?organizationId={{org_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "charts"],
+              "query": [{ "key": "organizationId", "value": "{{org_id}}" }]
+            }
+          }
+        },
+        {
+          "name": "Charts (Date-range filtered)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/charts?startDate=2026-01-01T00:00:00.000Z&endDate=2026-07-31T23:59:59.999Z",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "charts"],
+              "query": [
+                { "key": "startDate", "value": "2026-01-01T00:00:00.000Z" },
+                { "key": "endDate", "value": "2026-07-31T23:59:59.999Z" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "System Status (SUPER_ADMIN only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/system",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "system"]
+            },
+            "description": "Returns infrastructure health: DB status, Cloudinary config, socket status, uptime, memory usage."
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000" },
+    { "key": "access_token", "value": "your_jwt_here" },
+    { "key": "org_id", "value": "org_uuid_here" },
+    { "key": "workspace_id", "value": "ws_uuid_here" }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "logger",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "pino": "^8.16.2",
+    "pino-http": "^8.5.1",
+    "pino-pretty": "^10.2.3",
+    "config": "workspace:*"
+  },
+  "devDependencies": {
+    "eslint-config": "workspace:*",
+    "tsconfig": "workspace:*",
+    "@types/pino": "^7.0.5",
+    "typescript": "^5.2.2"
+  }
+}
