@@ -1,0 +1,5 @@
+[33m681daaf[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m chore: upgrade Next.js to 15.5.6
+[33m51b1d3e[m chore: upgrade Next.js to latest 15.x
+[33m79eb890[m[33m ([m[1;32mrelease/v1.0[m[33m)[m chore: final deployment hardening
+[33mba7583c[m[33m ([m[1;31morigin/release/v1.0[m[33m)[m Release v1.0 - Production Ready
+[33m0153d75[m fix: migrate turbo pipeline to tasks
