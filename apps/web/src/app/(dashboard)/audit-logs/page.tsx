@@ -3,16 +3,31 @@
 import { useState } from 'react';
 import { useAuditLogs } from '../../../hooks/useAuditLogs';
 import { useOrganizations } from '../../../hooks/useOrganizations';
-import { Activity, Building2, Server } from 'lucide-react';
+import { Activity, Building2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { TableSkeleton } from '../../../components/ui/TableSkeleton';
-import { EmptyState } from '../../../components/ui/EmptyState';
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+  GlassCard,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  Button,
+  EmptyState,
+  Skeleton
+} from 'ui';
 
 export default function AuditLogsPage() {
   const [selectedOrgId, setSelectedOrgId] = useState<string>('');
   const [page, setPage] = useState(1);
 
-  // We only fetch first 50 orgs for the dropdown as a simplification
   const { data: orgsData } = useOrganizations(1, 50);
   
   const { data: auditData, isLoading } = useAuditLogs(page, 20, selectedOrgId || undefined);
@@ -20,63 +35,54 @@ export default function AuditLogsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-          <Activity className="mr-3 text-gray-400" />
+        <h1 className="text-2xl font-bold flex items-center">
+          <Activity className="mr-3 text-muted-foreground" />
           Audit Logs
         </h1>
       </div>
 
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-gray-100 dark:border-zinc-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-50/50 dark:bg-zinc-900/50">
+      <GlassCard className="overflow-hidden p-0 border-0 shadow-sm">
+        <div className="p-4 border-b border-border bg-black/5 dark:bg-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-4 w-full sm:w-auto">
-            <div className="flex items-center bg-white dark:bg-zinc-950 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 w-full sm:w-auto">
-              <Building2 className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
-              <select
-                value={selectedOrgId}
-                onChange={(e) => { setSelectedOrgId(e.target.value); setPage(1); }}
-                className="bg-transparent border-none focus:ring-0 text-sm w-full sm:w-48 dark:text-white"
-              >
-                <option value="">All Organizations (Global)</option>
-                {orgsData?.data?.map((org: any) => (
-                  <option key={org.id} value={org.id}>{org.name}</option>
-                ))}
-              </select>
+            <div className="flex items-center bg-background border border-input rounded-md px-3 py-1 w-full sm:w-auto">
+              <Building2 className="w-4 h-4 text-muted-foreground mr-2 flex-shrink-0" />
+              <Select value={selectedOrgId} onValueChange={(val) => { setSelectedOrgId(val === 'global' ? '' : val); setPage(1); }}>
+                <SelectTrigger className="w-full sm:w-48 bg-transparent border-none focus:ring-0 shadow-none px-0 h-8">
+                  <SelectValue placeholder="All Organizations (Global)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="global">All Organizations (Global)</SelectItem>
+                  {orgsData?.data?.map((org: any) => (
+                    <SelectItem key={org.id} value={org.id}>{org.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-zinc-800">
-            <thead className="bg-gray-50 dark:bg-zinc-900/50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
-                  Action
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
-                  Entity
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
-                  Actor ID
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
-                  Target ID
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
-                  Timestamp
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Action</TableHead>
+                <TableHead>Entity</TableHead>
+                <TableHead>Actor ID</TableHead>
+                <TableHead>Target ID</TableHead>
+                <TableHead>Timestamp</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {isLoading ? (
-                <tr>
-                  <td colSpan={5}>
+                <TableRow>
+                  <TableCell colSpan={5} className="p-0">
                     <TableSkeleton columns={5} rows={10} />
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : auditData?.data?.length > 0 ? (
                 auditData.data.map((log: any) => (
-                  <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                  <TableRow key={log.id}>
+                    <TableCell>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         log.action.includes('CREATE') || log.action.includes('LOGIN') || log.action.includes('REGISTER') 
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
@@ -86,74 +92,70 @@ export default function AuditLogsPage() {
                       }`}>
                         {log.action}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    </TableCell>
+                    <TableCell className="font-medium">
                       {log.entity}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-zinc-400 font-mono">
+                    </TableCell>
+                    <TableCell className="text-muted-foreground font-mono">
                       {log.actorId ? (
                         <span title={log.actorId}>{log.actorId.substring(0, 8)}...</span>
                       ) : (
-                        <span className="text-gray-400 italic">System</span>
+                        <span className="text-muted-foreground italic">System</span>
                       )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-zinc-400 font-mono">
+                    </TableCell>
+                    <TableCell className="text-muted-foreground font-mono">
                       {log.entityId ? (
                         <span title={log.entityId}>{log.entityId.substring(0, 8)}...</span>
                       ) : (
                         '-'
                       )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-zinc-400">
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
                       {format(new Date(log.createdAt), 'MMM d, yyyy HH:mm:ss')}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               ) : (
-                <tr>
-                  <td colSpan={5} className="px-6 py-12 whitespace-nowrap text-sm text-gray-500 dark:text-zinc-400 text-center">
+                <TableRow>
+                  <TableCell colSpan={5} className="h-32 text-center">
                     <EmptyState 
-                      icon={Activity}
+                      icon={<Activity className="w-10 h-10" />}
                       title="No audit logs found"
                       description="No activities have been recorded yet."
                     />
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         {/* Pagination */}
-        <div className="bg-white dark:bg-zinc-900 px-4 py-3 border-t border-gray-200 dark:border-zinc-800 sm:px-6 flex items-center justify-between">
-          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-gray-700 dark:text-zinc-400">
-                Showing <span className="font-medium">{(page - 1) * 20 + 1}</span> to <span className="font-medium">{Math.min(page * 20, auditData?.meta?.total || 0)}</span> of{' '}
-                <span className="font-medium">{auditData?.meta?.total || 0}</span> results
-              </p>
-            </div>
-            <div>
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-sm font-medium text-gray-500 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-900 disabled:opacity-50"
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => setPage(p => p + 1)}
-                  disabled={page >= (auditData?.meta?.totalPages || 1)}
-                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-sm font-medium text-gray-500 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-900 disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </nav>
-            </div>
+        <div className="p-4 border-t border-border flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Showing <span className="font-medium">{auditData?.data?.length > 0 ? (page - 1) * 20 + 1 : 0}</span> to <span className="font-medium">{Math.min(page * 20, auditData?.meta?.total || 0)}</span> of{' '}
+            <span className="font-medium">{auditData?.meta?.total || 0}</span> results
+          </p>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => p + 1)}
+              disabled={page >= (auditData?.meta?.totalPages || 1)}
+            >
+              Next
+            </Button>
           </div>
         </div>
-      </div>
+      </GlassCard>
     </div>
   );
 }

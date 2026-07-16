@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { useUploadImage } from '../../../hooks/useStorage';
 import { HardDrive, Upload, Image as ImageIcon, X, CheckCircle2, AlertCircle } from 'lucide-react';
+import { GlassCard, Button } from 'ui';
 
 export default function StoragePage() {
   const [dragActive, setDragActive] = useState(false);
@@ -66,17 +67,17 @@ export default function StoragePage() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-          <HardDrive className="mr-3 text-gray-400" />
+        <h1 className="text-2xl font-bold flex items-center">
+          <HardDrive className="mr-3 text-muted-foreground" />
           Storage & Uploads
         </h1>
       </div>
 
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm p-6 sm:p-8">
+      <GlassCard className="p-6 sm:p-8">
         <div className="max-w-xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Upload an Image</h2>
-            <p className="text-sm text-gray-500 dark:text-zinc-400 mt-2">
+            <h2 className="text-xl font-semibold">Upload an Image</h2>
+            <p className="text-sm text-muted-foreground mt-2">
               JPG, PNG or WebP up to 10MB
             </p>
           </div>
@@ -94,10 +95,10 @@ export default function StoragePage() {
             <div 
               className={`relative border-2 border-dashed rounded-xl p-12 text-center transition-all ${
                 dragActive 
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/10' 
+                  ? 'border-primary bg-primary/10' 
                   : isPending 
-                    ? 'border-gray-200 bg-gray-50 dark:border-zinc-800 dark:bg-zinc-900 opacity-70' 
-                    : 'border-gray-300 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-500 hover:bg-gray-50 dark:hover:bg-zinc-800/50'
+                    ? 'border-border bg-black/5 dark:bg-white/5 opacity-70' 
+                    : 'border-border hover:border-muted-foreground hover:bg-black/5 dark:hover:bg-white/5'
               }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
@@ -106,25 +107,25 @@ export default function StoragePage() {
             >
               {isPending ? (
                 <div className="flex flex-col items-center justify-center space-y-4">
-                  <div className="w-full max-w-xs bg-gray-200 dark:bg-zinc-700 rounded-full h-2.5 mb-2">
-                    <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
+                  <div className="w-full max-w-xs bg-black/10 dark:bg-white/10 rounded-full h-2.5 mb-2">
+                    <div className="bg-primary h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
                   </div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-zinc-300">Uploading... {progress}%</p>
+                  <p className="text-sm font-medium text-muted-foreground">Uploading... {progress}%</p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center space-y-4">
-                  <div className="p-4 bg-gray-100 dark:bg-zinc-800 rounded-full">
-                    <Upload className="w-8 h-8 text-gray-500 dark:text-zinc-400" />
+                  <div className="p-4 bg-black/5 dark:bg-white/5 rounded-full">
+                    <Upload className="w-8 h-8 text-muted-foreground" />
                   </div>
                   <div>
                     <button 
                       type="button" 
                       onClick={() => inputRef.current?.click()}
-                      className="font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                      className="font-semibold text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary"
                     >
                       Click to upload
                     </button>
-                    <span className="text-gray-500 dark:text-zinc-400"> or drag and drop</span>
+                    <span className="text-muted-foreground"> or drag and drop</span>
                   </div>
                 </div>
               )}
@@ -132,22 +133,22 @@ export default function StoragePage() {
           </form>
 
           {error && (
-            <div className="mt-6 p-4 rounded-md bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 flex items-start">
-              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 mr-3 flex-shrink-0" />
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <div className="mt-6 p-4 rounded-md bg-destructive/10 border border-destructive/20 flex items-start">
+              <AlertCircle className="w-5 h-5 text-destructive mt-0.5 mr-3 flex-shrink-0" />
+              <p className="text-sm text-destructive">{error}</p>
             </div>
           )}
 
           {uploadedFileUrl && (
             <div className="mt-8">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-900 dark:text-white flex items-center">
+                <h3 className="text-sm font-medium flex items-center">
                   <CheckCircle2 className="w-5 h-5 text-green-500 mr-2" />
                   Upload Successful
                 </h3>
               </div>
-              <div className="border border-gray-200 dark:border-zinc-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-zinc-950 p-2">
-                <div className="relative aspect-video rounded-md overflow-hidden bg-gray-200 dark:bg-zinc-800 flex items-center justify-center">
+              <div className="border border-border rounded-lg overflow-hidden bg-black/5 dark:bg-white/5 p-2">
+                <div className="relative aspect-video rounded-md overflow-hidden bg-black/10 dark:bg-white/10 flex items-center justify-center">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
                     src={uploadedFileUrl} 
@@ -155,22 +156,23 @@ export default function StoragePage() {
                     className="max-w-full max-h-full object-contain"
                   />
                 </div>
-                <div className="mt-3 flex items-center bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md p-2">
-                  <div className="flex-1 truncate text-xs text-gray-500 dark:text-zinc-400 mr-2 select-all">
+                <div className="mt-3 flex items-center bg-background border border-border rounded-md p-2">
+                  <div className="flex-1 truncate text-xs text-muted-foreground mr-2 select-all">
                     {uploadedFileUrl}
                   </div>
-                  <button 
+                  <Button 
+                    variant="outline"
+                    size="sm"
                     onClick={() => navigator.clipboard.writeText(uploadedFileUrl)}
-                    className="px-3 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-medium rounded transition-colors"
                   >
                     Copy URL
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
           )}
         </div>
-      </div>
+      </GlassCard>
     </div>
   );
 }
