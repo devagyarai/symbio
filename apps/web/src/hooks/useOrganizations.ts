@@ -36,12 +36,27 @@ export function useCreateOrganization() {
       const { data } = await api.post('/organizations', payload);
       return data;
     },
+    onMutate: async (newOrg) => {
+      await queryClient.cancelQueries({ queryKey: ['organizations'] });
+      const previousOrgs = queryClient.getQueryData(['organizations']);
+      queryClient.setQueryData(['organizations'], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          items: [{ id: 'temp-' + Date.now(), ...newOrg }, ...old.items],
+        };
+      });
+      return { previousOrgs };
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       toast.success('Organization created successfully');
     },
-    onError: (err: any) => {
+    onError: (err: any, newOrg, context) => {
+      if (context?.previousOrgs) {
+        queryClient.setQueryData(['organizations'], context.previousOrgs);
+      }
       toast.error(err.response?.data?.error || 'Failed to create organization');
     },
   });
@@ -72,12 +87,27 @@ export function useDeleteOrganization() {
       const { data } = await api.delete(`/organizations/${id}`);
       return data;
     },
+    onMutate: async (deletedId) => {
+      await queryClient.cancelQueries({ queryKey: ['organizations'] });
+      const previousOrgs = queryClient.getQueryData(['organizations']);
+      queryClient.setQueryData(['organizations'], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          items: old.items.filter((item: any) => item.id !== deletedId),
+        };
+      });
+      return { previousOrgs };
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       toast.success('Organization deleted successfully');
     },
-    onError: (err: any) => {
+    onError: (err: any, deletedId, context) => {
+      if (context?.previousOrgs) {
+        queryClient.setQueryData(['organizations'], context.previousOrgs);
+      }
       toast.error(err.response?.data?.error || 'Failed to delete organization');
     },
   });

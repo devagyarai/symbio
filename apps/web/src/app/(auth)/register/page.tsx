@@ -7,8 +7,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'sonner';
-import { Button, Input, PasswordInput, GlassCard } from 'ui';
+import { Button, Input, PasswordInput } from 'ui';
 import { api } from '../../../lib/api';
+import { AuthLayout } from '../../../components/auth/AuthLayout';
+import { Mail, KeyRound, User, Loader2 } from 'lucide-react';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -64,93 +66,102 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 py-12 px-4 sm:px-6 lg:px-8">
-      <GlassCard className="max-w-md w-full space-y-8 p-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Create an account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-zinc-400">
-            Or{' '}
-            <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
-              sign in to your existing account
-            </Link>
-          </p>
+    <AuthLayout 
+      title="Create an account" 
+      subtitle={
+        <>
+          Already have an account?{' '}
+          <Link href="/login" className="font-semibold text-primary hover:text-primary/80 transition-colors">
+            Sign in
+          </Link>
+        </>
+      }
+    >
+      {error && (
+        <div className="mb-6 bg-destructive/10 border border-destructive/20 text-destructive text-sm p-3 rounded-xl text-center">
+          {error}
         </div>
-        
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm p-3 rounded-md text-center">
-            {error}
-          </div>
-        )}
+      )}
 
-        {success && (
-          <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 text-sm p-3 rounded-md text-center">
-            {success}
-          </div>
-        )}
+      {success && (
+        <div className="mb-6 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-sm p-3 rounded-xl text-center">
+          {success}
+        </div>
+      )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="rounded-md space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
-                Full Name
-              </label>
+      <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="name" className="text-sm font-medium">Full Name</label>
+            <div className="relative">
+              <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 id="name"
                 type="text"
                 placeholder="Jane Doe"
                 disabled={isSubmitting || !!success}
+                className="pl-9 h-11"
                 {...register('name')}
               />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name.message}</p>
-              )}
             </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
-                Email address
-              </label>
+            {errors.name && (
+              <p className="text-xs text-destructive">{errors.name.message}</p>
+            )}
+          </div>
+          
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-sm font-medium">Email address</label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 id="email"
                 type="email"
                 autoComplete="email"
                 placeholder="you@example.com"
                 disabled={isSubmitting || !!success}
+                className="pl-9 h-11"
                 {...register('email')}
               />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
-              )}
             </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
-                Password
-              </label>
+            {errors.email && (
+              <p className="text-xs text-destructive">{errors.email.message}</p>
+            )}
+          </div>
+          
+          <div className="space-y-2">
+            <label htmlFor="password" className="text-sm font-medium">Password</label>
+            <div className="relative">
+              <KeyRound className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground z-10" />
               <PasswordInput
                 id="password"
                 autoComplete="new-password"
                 placeholder="••••••••"
                 disabled={isSubmitting || !!success}
+                className="pl-9 h-11"
                 {...register('password')}
               />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password.message}</p>
-              )}
             </div>
+            {errors.password && (
+              <p className="text-xs text-destructive">{errors.password.message}</p>
+            )}
           </div>
+        </div>
 
-          <div>
-            <Button
-              type="submit"
-              disabled={isSubmitting || !!success}
-              className="w-full"
-            >
-              {isSubmitting ? 'Creating account...' : 'Create account'}
-            </Button>
-          </div>
-        </form>
-      </GlassCard>
-    </div>
+        <Button
+          type="submit"
+          disabled={isSubmitting || !!success}
+          className="w-full h-11 mt-4 relative overflow-hidden group"
+        >
+          {isSubmitting ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <>
+              <span className="relative z-10">Create account</span>
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+            </>
+          )}
+        </Button>
+      </form>
+    </AuthLayout>
   );
 }

@@ -17,7 +17,8 @@ export type WorkspacePermission =
   | 'canViewWorkspace'
   | 'canEditWorkspace'
   | 'canDeleteWorkspace'
-  | 'canManageWorkspaceMembers';
+  | 'canManageMembers'
+  | 'canInviteMembers';
 
 // -----------------------------------------------------------------------------
 // Permission Matrices
@@ -46,11 +47,18 @@ const ORG_ROLE_PERMISSIONS: Record<OrgRole, Set<OrganizationPermission>> = {
 };
 
 const WORKSPACE_ROLE_PERMISSIONS: Record<WorkspaceRole, Set<WorkspacePermission>> = {
-  ADMIN: new Set([
+  OWNER: new Set([
     'canViewWorkspace',
     'canEditWorkspace',
     'canDeleteWorkspace',
-    'canManageWorkspaceMembers',
+    'canManageMembers',
+    'canInviteMembers',
+  ]),
+  ADMIN: new Set([
+    'canViewWorkspace',
+    'canEditWorkspace',
+    'canManageMembers',
+    'canInviteMembers',
   ]),
   EDITOR: new Set([
     'canViewWorkspace',
@@ -68,7 +76,7 @@ const WORKSPACE_ROLE_PERMISSIONS: Record<WorkspaceRole, Set<WorkspacePermission>
 // Higher index = higher privilege
 const SYSTEM_ROLE_HIERARCHY: SystemRole[] = [SystemRole.USER, SystemRole.SUPER_ADMIN];
 const ORG_ROLE_HIERARCHY: OrgRole[] = [OrgRole.GUEST, OrgRole.MEMBER, OrgRole.ADMIN, OrgRole.OWNER];
-const WORKSPACE_ROLE_HIERARCHY: WorkspaceRole[] = [WorkspaceRole.VIEWER, WorkspaceRole.EDITOR, WorkspaceRole.ADMIN];
+const WORKSPACE_ROLE_HIERARCHY: WorkspaceRole[] = [WorkspaceRole.VIEWER, WorkspaceRole.EDITOR, WorkspaceRole.ADMIN, WorkspaceRole.OWNER];
 
 // -----------------------------------------------------------------------------
 // Permission Service

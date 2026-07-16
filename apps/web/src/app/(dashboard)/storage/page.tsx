@@ -2,8 +2,10 @@
 
 import { useState, useRef } from 'react';
 import { useUploadImage } from '../../../hooks/useStorage';
-import { HardDrive, Upload, Image as ImageIcon, X, CheckCircle2, AlertCircle } from 'lucide-react';
+import { HardDrive, Upload, Image as ImageIcon, X, CheckCircle2, AlertCircle, Copy, Link as LinkIcon } from 'lucide-react';
 import { GlassCard, Button } from 'ui';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 
 export default function StoragePage() {
   const [dragActive, setDragActive] = useState(false);
@@ -42,6 +44,7 @@ export default function StoragePage() {
     try {
       const response = await uploadImage({ file, workspaceId: 'default' });
       setUploadedFileUrl(response.url);
+      toast.success('Image uploaded successfully');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to upload image. Please try again.');
     }
@@ -64,19 +67,38 @@ export default function StoragePage() {
     }
   };
 
+  const handleCopy = () => {
+    if (uploadedFileUrl) {
+      navigator.clipboard.writeText(uploadedFileUrl);
+      toast.success('URL copied to clipboard');
+    }
+  };
+
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold flex items-center">
-          <HardDrive className="mr-3 text-muted-foreground" />
-          Storage & Uploads
-        </h1>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-6 max-w-4xl mx-auto"
+    >
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
+            <div className="p-2 bg-blue-500/10 rounded-xl">
+              <HardDrive className="w-6 h-6 text-blue-500" />
+            </div>
+            Storage & Uploads
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm">Manage assets and upload new media.</p>
+        </div>
       </div>
 
-      <GlassCard className="p-6 sm:p-8">
-        <div className="max-w-xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-xl font-semibold">Upload an Image</h2>
+      <GlassCard className="p-8 sm:p-12 relative overflow-hidden">
+        {/* Decorative background element */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        
+        <div className="max-w-xl mx-auto relative z-10">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-bold tracking-tight">Upload Media</h2>
             <p className="text-sm text-muted-foreground mt-2">
               JPG, PNG or WebP up to 10MB
             </p>
@@ -92,87 +114,155 @@ export default function StoragePage() {
               disabled={isPending}
             />
             
-            <div 
-              className={`relative border-2 border-dashed rounded-xl p-12 text-center transition-all ${
+            <motion.div 
+              whileHover={!isPending ? { scale: 1.01 } : {}}
+              whileTap={!isPending ? { scale: 0.99 } : {}}
+              className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer overflow-hidden ${
                 dragActive 
-                  ? 'border-primary bg-primary/10' 
+                  ? 'border-blue-500 bg-blue-500/10' 
                   : isPending 
-                    ? 'border-border bg-black/5 dark:bg-white/5 opacity-70' 
-                    : 'border-border hover:border-muted-foreground hover:bg-black/5 dark:hover:bg-white/5'
+                    ? 'border-border/50 bg-black/5 dark:bg-white/5 cursor-wait' 
+                    : 'border-border/50 hover:border-blue-500/50 hover:bg-blue-500/5'
               }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={handleDrop}
+              onClick={() => !isPending && inputRef.current?.click()}
             >
-              {isPending ? (
-                <div className="flex flex-col items-center justify-center space-y-4">
-                  <div className="w-full max-w-xs bg-black/10 dark:bg-white/10 rounded-full h-2.5 mb-2">
-                    <div className="bg-primary h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
-                  </div>
-                  <p className="text-sm font-medium text-muted-foreground">Uploading... {progress}%</p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center space-y-4">
-                  <div className="p-4 bg-black/5 dark:bg-white/5 rounded-full">
-                    <Upload className="w-8 h-8 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <button 
-                      type="button" 
-                      onClick={() => inputRef.current?.click()}
-                      className="font-semibold text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary"
-                    >
-                      Click to upload
-                    </button>
-                    <span className="text-muted-foreground"> or drag and drop</span>
-                  </div>
-                </div>
-              )}
-            </div>
+              <AnimatePresence mode="wait">
+                {isPending ? (
+                  <motion.div 
+                    key="uploading"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="flex flex-col items-center justify-center space-y-6 py-4"
+                  >
+                    <div className="relative">
+                      <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center">
+                        <Upload className="w-8 h-8 text-blue-500 animate-bounce" />
+                      </div>
+                      <svg className="absolute -inset-2 w-20 h-20 rotate-[-90deg]">
+                        <circle
+                          cx="40"
+                          cy="40"
+                          r="38"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          className="text-blue-500/20"
+                        />
+                        <circle
+                          cx="40"
+                          cy="40"
+                          r="38"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          strokeDasharray="238.76"
+                          strokeDashoffset={238.76 - (progress / 100) * 238.76}
+                          className="text-blue-500 transition-all duration-300"
+                        />
+                      </svg>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-foreground">Uploading file...</p>
+                      <p className="text-xs text-muted-foreground">{progress}% complete</p>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div 
+                    key="idle"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="flex flex-col items-center justify-center space-y-4"
+                  >
+                    <div className={`p-5 rounded-2xl transition-colors ${dragActive ? 'bg-blue-500/20 text-blue-500' : 'bg-black/5 dark:bg-white/5 text-muted-foreground'}`}>
+                      <Upload className="w-10 h-10" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-base mb-1">
+                        Click to upload <span className="font-normal text-muted-foreground">or drag and drop</span>
+                      </p>
+                      <p className="text-xs text-muted-foreground">High resolution images recommended</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           </form>
 
-          {error && (
-            <div className="mt-6 p-4 rounded-md bg-destructive/10 border border-destructive/20 flex items-start">
-              <AlertCircle className="w-5 h-5 text-destructive mt-0.5 mr-3 flex-shrink-0" />
-              <p className="text-sm text-destructive">{error}</p>
-            </div>
-          )}
+          <AnimatePresence>
+            {error && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="mt-6 p-4 rounded-xl bg-destructive/10 border border-destructive/20 flex items-start gap-3"
+              >
+                <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0" />
+                <p className="text-sm font-medium text-destructive mt-0.5">{error}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          {uploadedFileUrl && (
-            <div className="mt-8">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium flex items-center">
-                  <CheckCircle2 className="w-5 h-5 text-green-500 mr-2" />
-                  Upload Successful
-                </h3>
-              </div>
-              <div className="border border-border rounded-lg overflow-hidden bg-black/5 dark:bg-white/5 p-2">
-                <div className="relative aspect-video rounded-md overflow-hidden bg-black/10 dark:bg-white/10 flex items-center justify-center">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img 
-                    src={uploadedFileUrl} 
-                    alt="Uploaded file" 
-                    className="max-w-full max-h-full object-contain"
-                  />
-                </div>
-                <div className="mt-3 flex items-center bg-background border border-border rounded-md p-2">
-                  <div className="flex-1 truncate text-xs text-muted-foreground mr-2 select-all">
-                    {uploadedFileUrl}
+          <AnimatePresence>
+            {uploadedFileUrl && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="mt-8"
+              >
+                <div className="border border-border/50 rounded-2xl overflow-hidden bg-background/50 backdrop-blur-xl shadow-xl shadow-black/5">
+                  <div className="flex items-center justify-between p-4 border-b border-border/50 bg-black/[0.02] dark:bg-white/[0.02]">
+                    <h3 className="text-sm font-semibold flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                      Upload Successful
+                    </h3>
                   </div>
-                  <Button 
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigator.clipboard.writeText(uploadedFileUrl)}
-                  >
-                    Copy URL
-                  </Button>
+                  <div className="p-4 space-y-4">
+                    <div className="relative aspect-video rounded-xl overflow-hidden bg-black/5 dark:bg-white/5 flex items-center justify-center group">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src={uploadedFileUrl} 
+                        alt="Uploaded file" 
+                        className="max-w-full max-h-full object-contain"
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Button variant="secondary" onClick={() => window.open(uploadedFileUrl, '_blank')} className="rounded-xl shadow-lg">
+                          <ImageIcon className="w-4 h-4 mr-2" />
+                          View Full Size
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 border border-border/50 rounded-xl p-2">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-background shadow-sm">
+                        <LinkIcon className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1 truncate text-sm text-muted-foreground font-mono px-2 select-all">
+                        {uploadedFileUrl}
+                      </div>
+                      <Button 
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleCopy}
+                        className="rounded-lg shadow-sm"
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy URL
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </GlassCard>
-    </div>
+    </motion.div>
   );
 }

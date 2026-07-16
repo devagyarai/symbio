@@ -86,6 +86,7 @@ enum OrgRole {
 }
 
 enum WorkspaceRole {
+  OWNER
   ADMIN
   EDITOR
   VIEWER
@@ -114,6 +115,10 @@ model User {
   refreshTokens        RefreshToken[]
   auditLogs            AuditLog[]
   uploadedFiles        FileAsset[]
+  notifications        Notification[]
+  aiConversations      AiConversation[]
+  invitesSent          WorkspaceInvite[]        @relation("InvitesSent")
+  preference           UserPreference?
 }
 
 model Organization {
@@ -136,9 +141,12 @@ model Workspace {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  organization Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  memberships  WorkspaceMembership[]
-  fileAssets   FileAsset[]
+  organization    Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  memberships     WorkspaceMembership[]
+  fileAssets      FileAsset[]
+  folders         Folder[]
+  invites         WorkspaceInvite[]
+  aiConversations AiConversation[]
 
   @@unique([organizationId, slug])
 }
@@ -221,11 +229,103 @@ model FileAsset {
   size               Int
   cloudinaryPublicId String
   url                String
+  folderId           String?
   createdAt          DateTime @default(now())
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+  folder    Folder?   @relation(fields: [folderId], references: [id])
 
   @@index([workspaceId])
   @@index([uploadedBy])
+}
+
+model Folder {
+  id          String   @id @default(uuid())
+  name        String
+  workspaceId String
+  parentId    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  parent    Folder?     @relation("FolderToFolder", fields: [parentId], references: [id])
+  children  Folder[]    @relation("FolderToFolder")
+  files     FileAsset[]
+
+  @@index([workspaceId])
+  @@index([parentId])
+}
+
+model WorkspaceInvite {
+  id          String        @id @default(uuid())
+  email       String
+  workspaceId String
+  role        WorkspaceRole @default(VIEWER)
+  invitedBy   String
+  token       String        @unique
+  expiresAt   DateTime
+  createdAt   DateTime      @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  inviter   User      @relation("InvitesSent", fields: [invitedBy], references: [id], onDelete: Cascade)
+
+  @@unique([email, workspaceId])
+  @@index([workspaceId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String // INVITE, FILE_UPLOAD, ROLE_CHANGE, AI_INSIGHT, SECURITY
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  link      String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AiConversation {
+  id          String   @id @default(uuid())
+  workspaceId String?
+  userId      String
+  title       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace?  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  messages  AiMessage[]
+
+  @@index([userId])
+  @@index([workspaceId])
+}
+
+model AiMessage {
+  id             String   @id @default(uuid())
+  conversationId String
+  role           String // "user", "assistant", "system"
+  content        String
+  createdAt      DateTime @default(now())
+
+  conversation AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+}
+
+model UserPreference {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  theme              String   @default("system")
+  emailNotifications Boolean  @default(true)
+  timezone           String   @default("UTC")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

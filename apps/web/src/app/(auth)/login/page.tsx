@@ -7,9 +7,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'sonner';
-import { Button, Input, PasswordInput, Checkbox, GlassCard } from 'ui';
+import { Button, Input, PasswordInput, Checkbox } from 'ui';
 import { api } from '../../../lib/api';
 import { useAuthStore } from '../../../store/useAuthStore';
+import { AuthLayout } from '../../../components/auth/AuthLayout';
+import { Mail, KeyRound, Loader2 } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -60,87 +62,90 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 py-12 px-4 sm:px-6 lg:px-8">
-      <GlassCard className="max-w-md w-full space-y-8 p-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Sign in to Symbio
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-zinc-400">
-            Or{' '}
-            <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
-              create a new account
-            </Link>
-          </p>
+    <AuthLayout 
+      title="Welcome back" 
+      subtitle={
+        <>
+          New to Symbio?{' '}
+          <Link href="/register" className="font-semibold text-primary hover:text-primary/80 transition-colors">
+            Create an account
+          </Link>
+        </>
+      }
+    >
+      {error && (
+        <div className="mb-6 bg-destructive/10 border border-destructive/20 text-destructive text-sm p-3 rounded-xl text-center">
+          {error}
         </div>
-        
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm p-3 rounded-md text-center">
-            {error}
-          </div>
-        )}
+      )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="rounded-md space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
-                Email address
-              </label>
+      <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-sm font-medium">Email address</label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 id="email"
                 type="email"
                 autoComplete="email"
                 placeholder="you@example.com"
                 disabled={isSubmitting}
+                className="pl-9 h-11"
                 {...register('email')}
               />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
-              )}
             </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
-                Password
-              </label>
+            {errors.email && (
+              <p className="text-xs text-destructive">{errors.email.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="password" className="text-sm font-medium">Password</label>
+            <div className="relative">
+              <KeyRound className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground z-10" />
               <PasswordInput
                 id="password"
                 autoComplete="current-password"
                 placeholder="••••••••"
                 disabled={isSubmitting}
+                className="pl-9 h-11"
                 {...register('password')}
               />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password.message}</p>
-              )}
             </div>
+            {errors.password && (
+              <p className="text-xs text-destructive">{errors.password.message}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox id="remember-me" />
+            <label htmlFor="remember-me" className="text-sm font-medium leading-none cursor-pointer">
+              Remember me
+            </label>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Checkbox id="remember-me" />
-              <label htmlFor="remember-me" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-900 dark:text-zinc-300">
-                Remember me
-              </label>
-            </div>
+          <Link href="/forgot-password" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
+            Forgot password?
+          </Link>
+        </div>
 
-            <div className="text-sm">
-              <Link href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
-                Forgot your password?
-              </Link>
-            </div>
-          </div>
-
-          <div>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full"
-            >
-              {isSubmitting ? 'Signing in...' : 'Sign in'}
-            </Button>
-          </div>
-        </form>
-      </GlassCard>
-    </div>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full h-11 mt-4 relative overflow-hidden group"
+        >
+          {isSubmitting ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <>
+              <span className="relative z-10">Sign in</span>
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+            </>
+          )}
+        </Button>
+      </form>
+    </AuthLayout>
   );
 }

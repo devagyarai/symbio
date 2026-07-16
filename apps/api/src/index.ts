@@ -17,6 +17,7 @@ import workspaceRoutes from "./modules/workspace/workspace.routes";
 import uploadRoutes from "./modules/upload/upload.routes";
 import auditRoutes from "./modules/audit/audit.routes";
 import dashboardRoutes from "./modules/dashboard/dashboard.routes";
+import inviteRoutes from "./modules/workspace/invite.routes";
 import { initSocketServer } from "./socket/socket.server";
 
 const app = express();
@@ -57,6 +58,7 @@ app.use("/workspaces", workspaceRoutes);
 app.use("/upload", uploadRoutes);
 app.use("/audit", auditRoutes);
 app.use("/dashboard", dashboardRoutes);
+app.use("/invites", inviteRoutes);
 
 // Error Handling (Must be last)
 app.use(notFoundHandler);

@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '../../../lib/api';
 import { Suspense } from 'react';
+import { AuthLayout } from '../../../components/auth/AuthLayout';
+import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 function VerifyEmailContent() {
   const router = useRouter();
@@ -39,48 +42,72 @@ function VerifyEmailContent() {
   }, [token, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white dark:bg-zinc-900 p-8 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-800 text-center">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Email Verification
-          </h2>
-        </div>
-        
-        <div className="mt-8 space-y-6">
-          {status === 'loading' && (
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-              <p className="text-gray-600 dark:text-zinc-400">{message}</p>
-            </div>
-          )}
+    <AuthLayout title="Email Verification">
+      <div className="mt-4 space-y-6">
+        {status === 'loading' && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center space-y-4 py-8"
+          >
+            <Loader2 className="w-10 h-10 animate-spin text-primary" />
+            <p className="text-muted-foreground font-medium text-sm">{message}</p>
+          </motion.div>
+        )}
 
-          {status === 'success' && (
-            <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 p-4 rounded-md">
-              <p>{message}</p>
-              <p className="text-sm mt-2">Redirecting to login...</p>
-            </div>
-          )}
-
-          {status === 'error' && (
-            <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 p-4 rounded-md">
-              <p>{message}</p>
-              <div className="mt-4">
-                <Link href="/login" className="text-blue-600 hover:text-blue-500 font-medium text-sm">
-                  Return to login
-                </Link>
+        {status === 'success' && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center space-y-6"
+          >
+            <div className="flex justify-center">
+              <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center border-4 border-background shadow-inner">
+                <CheckCircle2 className="w-8 h-8 text-emerald-500" />
               </div>
             </div>
-          )}
-        </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-2 text-emerald-500">Verified!</h3>
+              <p className="text-muted-foreground text-sm">{message}</p>
+              <p className="text-xs text-muted-foreground mt-2">Redirecting to login...</p>
+            </div>
+          </motion.div>
+        )}
+
+        {status === 'error' && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center space-y-6"
+          >
+            <div className="flex justify-center">
+              <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center border-4 border-background shadow-inner">
+                <AlertCircle className="w-8 h-8 text-destructive" />
+              </div>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-2 text-destructive">Verification Failed</h3>
+              <p className="text-muted-foreground text-sm">{message}</p>
+            </div>
+            <div className="pt-4">
+              <Link href="/login" className="inline-flex items-center justify-center w-full h-11 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-xl font-medium transition-colors">
+                Return to login
+              </Link>
+            </div>
+          </motion.div>
+        )}
       </div>
-    </div>
+    </AuthLayout>
   );
 }
 
 export default function VerifyEmailPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950">Loading...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    }>
       <VerifyEmailContent />
     </Suspense>
   );
