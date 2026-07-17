@@ -71,6 +71,9 @@ const config: Config = {
           foreground: "#F0F9FF",
         },
       },
+      fontFamily: {
+        sans: ["var(--font-sans)", "sans-serif"],
+      },
       fontSize: {
         display: ["3rem", { lineHeight: "1.1", letterSpacing: "-0.04em", fontWeight: "600" }],
         h1: ["2.25rem", { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "600" }],
