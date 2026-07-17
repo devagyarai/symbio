@@ -1,14 +1,30 @@
 import * as React from "react";
+import { motion } from "framer-motion";
 import { cn } from "../utils";
+import { MotionTokens } from "../styles/tokens";
 
-const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn("rounded-xl border bg-card text-card-foreground shadow", className)}
-      {...props}
-    />
-  )
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  animate?: boolean;
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, animate = false, ...props }, ref) => {
+    const Component = animate ? motion.div : "div";
+    const animationProps = animate ? {
+      initial: { opacity: 0, y: 10 },
+      animate: { opacity: 1, y: 0 },
+      transition: MotionTokens.spring.smooth,
+    } : {};
+
+    return (
+      <Component
+        ref={ref}
+        className={cn("rounded-xl border bg-card text-card-foreground shadow", className)}
+        {...(animationProps as any)}
+        {...props}
+      />
+    );
+  }
 );
 Card.displayName = "Card";
 

@@ -15,6 +15,10 @@ import { PresenceService } from '../../socket/presence.service';
  *  - WS ADMIN    → must pass their workspaceId; can see workspace-scoped data
  *  - Others      → 403
  */
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
 async function resolveScope(req: Request): Promise<{
   organizationId?: string;
   workspaceId?: string;
@@ -23,35 +27,45 @@ async function resolveScope(req: Request): Promise<{
   const user = (req as any).user!;
   const isSuperAdmin = user.systemRole === 'SUPER_ADMIN';
 
-  const queryOrgId = req.query.organizationId as string | undefined;
+  let queryOrgId = req.query.organizationId as string | undefined;
   const queryWsId = req.query.workspaceId as string | undefined;
 
   if (isSuperAdmin) {
     return { organizationId: queryOrgId, workspaceId: queryWsId, isSuperAdmin };
   }
 
-  // Org Owner scope
-  if (queryOrgId) {
-    const isOwner = await PermissionService.verifyOrgRole(user.userId, queryOrgId, 'OWNER');
-    if (!isOwner) {
-      throw new AuthorizationError('Only organization owners can view organization analytics');
+  if (!queryOrgId && !queryWsId) {
+    const firstOrg = await prisma.organizationMembership.findFirst({
+      where: { userId: user.userId },
+      orderBy: { createdAt: 'asc' },
+    });
+    if (firstOrg) {
+      queryOrgId = firstOrg.organizationId;
+    } else {
+      // If no orgs, return a dummy UUID so DashboardService safely returns 0s instead of global stats
+      return { organizationId: '00000000-0000-0000-0000-000000000000', isSuperAdmin };
     }
-    return { organizationId: queryOrgId, isSuperAdmin };
   }
 
   // Workspace Admin scope
   if (queryWsId) {
-    const isAdmin = await PermissionService.verifyWorkspaceRole(user.userId, queryWsId, 'ADMIN');
-    if (!isAdmin) {
-      throw new AuthorizationError('Only workspace admins can view workspace analytics');
+    const isMember = await PermissionService.verifyWorkspaceRole(user.userId, queryWsId, 'VIEWER');
+    if (!isMember) {
+      throw new AuthorizationError('You must be a member of this workspace to view its analytics');
     }
     return { workspaceId: queryWsId, isSuperAdmin };
   }
 
-  // No scope provided and not super admin → 403
-  throw new AuthorizationError(
-    'Access denied. Provide an organizationId or workspaceId you manage, or be a SUPER_ADMIN.',
-  );
+  // Org scope
+  if (queryOrgId) {
+    const isMember = await PermissionService.verifyOrgRole(user.userId, queryOrgId, 'MEMBER');
+    if (!isMember) {
+      throw new AuthorizationError('You must be a member of this organization to view its analytics');
+    }
+    return { organizationId: queryOrgId, isSuperAdmin };
+  }
+
+  throw new AuthorizationError('Access denied.');
 }
 
 // ─── Controller ───────────────────────────────────────────────────────────────

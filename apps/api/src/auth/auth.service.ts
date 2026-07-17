@@ -1,5 +1,6 @@
 import { PrismaClient, SessionStatus } from '@prisma/client';
 import { RegisterInput, LoginInput } from 'validation';
+import { ConflictError, AuthenticationError } from 'errors';
 import { HashUtil } from '../utils/hash.util';
 import { JwtUtil } from '../utils/jwt.util';
 import { EmailService } from '../services/email.service';
@@ -17,7 +18,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new Error('User already exists');
+      throw new ConflictError('User already exists');
     }
 
     const hashedPassword = await HashUtil.hash(data.password);
@@ -58,12 +59,12 @@ export class AuthService {
     });
 
     if (!user || !user.password) {
-      throw new Error('Invalid email or password');
+      throw new AuthenticationError('Invalid email or password');
     }
 
     const isValid = await HashUtil.compare(data.password, user.password);
     if (!isValid) {
-      throw new Error('Invalid email or password');
+      throw new AuthenticationError('Invalid email or password');
     }
 
     const payload = {
@@ -121,7 +122,7 @@ export class AuthService {
     });
 
     if (!storedToken || storedToken.revokedAt || storedToken.expiresAt < new Date()) {
-      throw new Error('Invalid or expired refresh token');
+      throw new AuthenticationError('Invalid or expired refresh token');
     }
 
     // 3. Check Session
@@ -130,7 +131,7 @@ export class AuthService {
     });
 
     if (!session || session.status !== SessionStatus.ACTIVE || session.expiresAt < new Date()) {
-      throw new Error('Session invalid or expired');
+      throw new AuthenticationError('Session invalid or expired');
     }
 
     // 4. Revoke old token and session using optimistic concurrency
@@ -146,13 +147,13 @@ export class AuthService {
     ]);
 
     if (tokenUpdate.count === 0) {
-      throw new Error('Refresh token has already been revoked concurrently');
+      throw new AuthenticationError('Refresh token has already been revoked concurrently');
     }
 
     // 5. Fetch latest user details and generate new tokens
     const user = await prisma.user.findUnique({ where: { id: payload.userId } });
     if (!user) {
-      throw new Error('User not found');
+      throw new AuthenticationError('User not found');
     }
 
     const newPayload = {
@@ -236,12 +237,12 @@ export class AuthService {
     });
 
     if (!verificationToken) {
-      throw new Error('Invalid or expired verification token');
+      throw new AuthenticationError('Invalid or expired verification token');
     }
 
     if (verificationToken.expiresAt < new Date()) {
       await prisma.verificationToken.delete({ where: { token } });
-      throw new Error('Verification token has expired');
+      throw new AuthenticationError('Verification token has expired');
     }
 
     const user = await prisma.user.findUnique({
@@ -249,7 +250,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new AuthenticationError('User not found');
     }
 
     await prisma.$transaction([
@@ -279,7 +280,7 @@ export class AuthService {
     }
 
     if (user.emailVerified) {
-      throw new Error('Email is already verified');
+      throw new ConflictError('Email is already verified');
     }
 
     // Invalidate old tokens
@@ -340,12 +341,12 @@ export class AuthService {
     });
 
     if (!verificationToken) {
-      throw new Error('Invalid or expired reset token');
+      throw new AuthenticationError('Invalid or expired reset token');
     }
 
     if (verificationToken.expiresAt < new Date()) {
       await prisma.verificationToken.delete({ where: { token } });
-      throw new Error('Reset token has expired');
+      throw new AuthenticationError('Reset token has expired');
     }
 
     const user = await prisma.user.findUnique({
@@ -353,7 +354,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new AuthenticationError('User not found');
     }
 
     const hashedPassword = await HashUtil.hash(newPassword);

@@ -6,7 +6,7 @@ import { GlassCard } from 'ui';
 
 export function AuthLayout({ children, title, subtitle }: { children: React.ReactNode, title: string, subtitle?: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] animate-pulse" />
@@ -45,6 +45,6 @@ export function AuthLayout({ children, title, subtitle }: { children: React.Reac
           {children}
         </GlassCard>
       </motion.div>
-    </div>
+    </main>
   );
 }

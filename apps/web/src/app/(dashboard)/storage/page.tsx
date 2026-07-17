@@ -2,6 +2,8 @@
 
 import { useState, useRef } from 'react';
 import { useUploadImage } from '../../../hooks/useStorage';
+import { useOrganizations } from '../../../hooks/useOrganizations';
+import { useWorkspaces } from '../../../hooks/useWorkspaces';
 import { HardDrive, Upload, Image as ImageIcon, X, CheckCircle2, AlertCircle, Copy, Link as LinkIcon } from 'lucide-react';
 import { GlassCard, Button } from 'ui';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,6 +15,10 @@ export default function StoragePage() {
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { mutateAsync: uploadImage, isPending, progress } = useUploadImage();
+  const { data: orgsResponse } = useOrganizations();
+  const firstOrgId = orgsResponse?.data?.[0]?.id;
+  const { data: wsResponse } = useWorkspaces(firstOrgId || '');
+  const activeWorkspaceId = wsResponse?.data?.[0]?.id;
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -42,7 +48,11 @@ export default function StoragePage() {
     }
 
     try {
-      const response = await uploadImage({ file, workspaceId: 'default' });
+      if (!activeWorkspaceId) {
+        setError('No active workspace found. Please create a workspace first.');
+        return;
+      }
+      const response = await uploadImage({ file, workspaceId: activeWorkspaceId });
       setUploadedFileUrl(response.url);
       toast.success('Image uploaded successfully');
     } catch (err: any) {

@@ -13,13 +13,13 @@ export class AuditController {
       // Authorization logic
       if (query.workspaceId) {
         // Must be Workspace ADMIN or SUPER_ADMIN
-        const canManage = await PermissionService.verifyWorkspaceRole(user.id, query.workspaceId, 'ADMIN');
+        const canManage = await PermissionService.verifyWorkspaceRole(user.userId, query.workspaceId, 'ADMIN');
         if (!canManage && user.systemRole !== 'SUPER_ADMIN') {
           throw new AuthorizationError('Only workspace admins can view workspace audit logs');
         }
       } else if (query.organizationId) {
         // Must be Organization OWNER or SUPER_ADMIN
-        const canManage = await PermissionService.verifyOrgRole(user.id, query.organizationId, 'OWNER');
+        const canManage = await PermissionService.verifyOrgRole(user.userId, query.organizationId, 'OWNER');
         if (!canManage && user.systemRole !== 'SUPER_ADMIN') {
           throw new AuthorizationError('Only organization owners can view organization audit logs');
         }

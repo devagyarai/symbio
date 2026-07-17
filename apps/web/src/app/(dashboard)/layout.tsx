@@ -164,7 +164,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="fixed inset-y-0 left-0 w-72 bg-background p-0 flex flex-col shadow-2xl">
             <div className="flex items-center justify-between p-4 border-b border-border/50">
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60 px-2">Symbio</span>
-              <IconButton variant="ghost" onClick={() => setSidebarOpen(false)}>
+              <IconButton aria-label="Close sidebar" variant="ghost" onClick={() => setSidebarOpen(false)}>
                 <X className="w-5 h-5" />
               </IconButton>
             </div>
@@ -178,6 +178,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Sidebar collapsed={collapsed} className="hidden lg:flex lg:fixed lg:inset-y-0 lg:z-50 group transition-all duration-300">
           <SidebarContent />
           <IconButton
+            aria-label="Toggle sidebar"
             variant="ghost"
             className="absolute -right-3 top-8 w-6 h-6 rounded-full border border-border shadow-sm bg-background hidden lg:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-50 hover:scale-110"
             onClick={() => setCollapsed(!collapsed)}
@@ -199,12 +200,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Button>
             </div>
             <div className="flex items-center space-x-2">
-              <IconButton variant="ghost" className="rounded-full w-9 h-9 relative">
+              <IconButton aria-label="Notifications" variant="ghost" className="rounded-full w-9 h-9 relative">
                 <Bell className="w-[18px] h-[18px] text-muted-foreground" />
                 <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-background animate-pulse"></span>
               </IconButton>
               {mounted && (
                 <IconButton 
+                  aria-label="Toggle theme"
                   variant="ghost" 
                   className="rounded-full w-9 h-9" 
                   onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -223,7 +225,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <Navbar className="lg:hidden justify-between px-4 bg-background/80 backdrop-blur-md rounded-none mx-0 mt-0 h-16 border-b border-border shadow-none sticky top-0">
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">Symbio</span>
             <div className="flex items-center space-x-2">
-              <IconButton variant="ghost" className="w-9 h-9" onClick={() => setSidebarOpen(true)}>
+              <IconButton aria-label="Open sidebar" variant="ghost" className="w-9 h-9" onClick={() => setSidebarOpen(true)}>
                 <Menu className="w-5 h-5" />
               </IconButton>
             </div>

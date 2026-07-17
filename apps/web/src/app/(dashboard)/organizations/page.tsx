@@ -214,7 +214,7 @@ export default function OrganizationsPage() {
 
       {/* Create Modal */}
       <Modal open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <ModalContent className="sm:max-w-md p-6">
+        <ModalContent aria-label="Create Organization" className="sm:max-w-md p-6">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-6">
@@ -266,7 +266,12 @@ export default function OrganizationsPage() {
                 disabled={createOrg.isPending}
                 className="rounded-xl shadow-lg shadow-primary/20 h-10 min-w-[120px]"
               >
-                {createOrg.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create'}
+                {createOrg.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="sr-only">Creating...</span>
+                  </>
+                ) : 'Create'}
               </Button>
             </div>
           </form>

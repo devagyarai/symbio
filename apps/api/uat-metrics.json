@@ -1,0 +1,59 @@
+{
+  "networkErrors": [
+    {
+      "url": "http://localhost:3000/favicon.ico",
+      "status": 404
+    }
+  ],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "accessibilityViolations": [
+    {
+      "page": "Landing",
+      "violations": []
+    },
+    {
+      "page": "Dashboard",
+      "violations": []
+    }
+  ],
+  "performance": [
+    {
+      "page": "Landing",
+      "data": {
+        "Timestamp": 97898.348292,
+        "Documents": 4,
+        "Frames": 4,
+        "JSEventListeners": 356,
+        "Nodes": 162,
+        "LayoutCount": 5,
+        "RecalcStyleCount": 17,
+        "LayoutDuration": 0.047837,
+        "RecalcStyleDuration": 0.009358,
+        "ScriptDuration": 0.140073,
+        "TaskDuration": 0.907938,
+        "JSHeapUsedSize": 6291836,
+        "JSHeapTotalSize": 8126464
+      }
+    },
+    {
+      "page": "Dashboard",
+      "data": {
+        "Timestamp": 97921.64267,
+        "Documents": 4,
+        "Frames": 4,
+        "JSEventListeners": 1857,
+        "Nodes": 1315,
+        "LayoutCount": 47,
+        "RecalcStyleCount": 184,
+        "LayoutDuration": 0.071164,
+        "RecalcStyleDuration": 0.118052,
+        "ScriptDuration": 0.326719,
+        "TaskDuration": 1.843939,
+        "JSHeapUsedSize": 19380208,
+        "JSHeapTotalSize": 30126080
+      }
+    }
+  ]
+}

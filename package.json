@@ -14,7 +14,7 @@
     "test:env": "turbo run test:env",
     "test": "turbo run test",
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --concurrency=15",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean",
@@ -22,9 +22,13 @@
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@axe-core/puppeteer": "^4.12.1",
     "husky": "^8.0.0",
+    "imagetracerjs": "^1.2.6",
+    "jimp": "^1.6.1",
     "lint-staged": "^15.0.0",
     "prettier": "^3.0.0",
+    "puppeteer": "^25.3.0",
     "turbo": "latest"
   },
   "packageManager": "pnpm@9.0.0",
